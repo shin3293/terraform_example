@@ -1,4 +1,4 @@
-#aws/asg/terraform.tfvars
+#aws/asg/variables.tf
 variable "region" { type = string }
 variable "prefix" { type = string }
 variable "instance_type" { type = string }

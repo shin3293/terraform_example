@@ -12,8 +12,8 @@ resource "aws_lb" "aws09_alb" {
   }
 }
 
-#was 대상 그룹 생성
-resource "aws_lb_target_group" "aws09_was_group" {
+# WAS 대상그룹 생성
+resource "aws_lb_target_group" "aws09_alb_was_group" {
   name     = "${var.prefix}-alb-was-group"
   port     = 80
   protocol = "HTTP"
@@ -31,26 +31,8 @@ resource "aws_lb_target_group" "aws09_was_group" {
     Name = "${var.prefix}-alb-was-group"
   }
 }
-
-#리스너 설정
-resource "aws_lb_listener" "aws09_alb_listener" {
-  load_balancer_arn = aws_lb.aws09_alb.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  certificate_arn   = var.certificate_arn
-  default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Not Found"
-      status_code  = "404"
-    }
-    target_group_arn = aws_lb_target_group.aws09_was_group.arn
-  }
-}
-#jenkins 대상 그룹 생성
-resource "aws_lb_target_group" "aws09_jenkins_group" {
+# Jenkins 대상그룹 생성
+resource "aws_lb_target_group" "aws09_alb_jenkins_group" {
   name     = "${var.prefix}-alb-jenkins-group"
   port     = 80
   protocol = "HTTP"
@@ -69,33 +51,48 @@ resource "aws_lb_target_group" "aws09_jenkins_group" {
   }
 }
 
-# was 리스너 규칙
+# 리스너 설정
+resource "aws_lb_listener" "aws09_alb_listener" {
+  load_balancer_arn = aws_lb.aws09_alb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = var.certificate_arn
+  default_action {
+    type             = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Not Found"
+      status_code  = "404"
+    }
+  }
+}
+
+# WAS 리스너 규칙
 resource "aws_lb_listener_rule" "aws09_alb_was_rule" {
   listener_arn = aws_lb_listener.aws09_alb_listener.arn
   priority     = 10
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.aws09_was_group.arn
+    target_group_arn = aws_lb_target_group.aws09_alb_was_group.arn
   }
   condition {
-    path_pattern {
+    host_header {
       values = ["${var.prefix}-was.busanit.com"]
     }
   }
 }
-
-# jenkins 리스너 규칙
+# Jenkins 리스너 규칙
 resource "aws_lb_listener_rule" "aws09_alb_jenkins_rule" {
   listener_arn = aws_lb_listener.aws09_alb_listener.arn
   priority     = 20
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.aws09_jenkins_group.arn
+    target_group_arn = aws_lb_target_group.aws09_alb_jenkins_group.arn
   }
   condition {
     host_header {
       values = ["${var.prefix}-jenkins.busanit.com"]
     }
   }
-
 }

@@ -1,3 +1,4 @@
+# variables.tf
 variable "region" { type = string }
 variable "availability_zone" { type = list(string) }
 variable "vpc_cidr_block" { type = string }
