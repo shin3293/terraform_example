@@ -9,14 +9,14 @@ resource "aws_instance" "aws09_jenkins_server" {
   }
   
   # network 모듈에서 생성한 NAT 게이트웨이와 연결된 Private Subnet 1번 사용
-  subnet_id              = data.aws_subnets.aws09_private_subnets.ids[0]
+  subnet_id              = data.terraform_remote_state.network.outputs.private_subnet_ids[0]
   
   # 프라이빗 망이므로 퍼블릭 IP는 할당하지 않음
   associate_public_ip_address = false
 
   vpc_security_group_ids = [
-    data.aws_security_group.aws09_ssh_sg.id, 
-    data.aws_security_group.aws09_http_sg.id
+    data.terraform_remote_state.network.outputs.ssh_sg_id,
+    data.terraform_remote_state.network.outputs.http_sg_id
   ]
   
   # data.tf (33번 라인 부근)에 정의된 인스턴스 프로파일 참조

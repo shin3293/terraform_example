@@ -1,27 +1,9 @@
-# aws_infra/ec2/data.tf
-data "aws_vpc" "aws09_vpc" {
-  filter {
-    name   = "tag:Name"
-    values = ["${var.prefix}-vpc"]
-  }
-}
-data "aws_subnet" "aws09_public_subnet" {
-  filter {
-    name   = "tag:Name"
-    values = ["${var.prefix}-public-subnet-1"]
-  }
-}
-
-data "aws_security_group" "aws09_ssh_sg" {
-  filter {
-    name   = "tag:Name"
-    values = ["${var.prefix}-ssh-sg"]
-  }
-}
-
-data "aws_security_group" "aws09_http_sg" {
-  filter {
-    name   = "tag:Name"
-    values = ["${var.prefix}-http-sg"]
+# aws_infra/03_ec2/data.tf
+data "terraform_remote_state" "network" {
+  backend = "s3"
+  config = {
+    bucket = var.remote_state_bucket
+    key    = "network/terraform.tfstate"
+    region = var.region
   }
 }

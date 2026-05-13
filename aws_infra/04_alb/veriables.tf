@@ -1,4 +1,5 @@
-#terraform.tfvars
+#variables.tf
 variable "region" { type = string }
 variable "prefix" { type = string }
 variable "certificate_arn" { type = string }
+variable "remote_state_bucket" { type = string }

@@ -4,10 +4,10 @@ resource "aws_instance" "aws09_instance" {
   instance_type               = var.instance_type
   associate_public_ip_address = true
   key_name                    = var.key_name
-  subnet_id                   = data.aws_subnet.aws09_public_subnet.id
+  subnet_id                   = data.terraform_remote_state.network.outputs.public_subnet_ids[0]
   security_groups = [
-    data.aws_security_group.aws09_ssh_sg.id,
-    data.aws_security_group.aws09_http_sg.id
+    data.terraform_remote_state.network.outputs.ssh_sg_id,
+    data.terraform_remote_state.network.outputs.http_sg_id
   ]
   # CodeDeploy Agent, Docker 설치
   user_data = <<-EOF
